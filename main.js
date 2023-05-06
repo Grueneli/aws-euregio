@@ -34,10 +34,37 @@ L.control.scale({
     imperial: false,
 }).addTo(map);
 
-// Vienna Sightseeing Haltestellen
+// Wetterstationen Tirol
 async function showStations(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
+    L.geoJSON(jsondata, {
+        pointToLayer: function (feature, latlng){
+            console.log(feature.geometry.coordinates)
+            return L.marker (latlng, {
+                icon: L.icon({
+                    iconUrl: "icons/icons.png",
+                    iconSize: [32,37],
+                    iconAnchor: [16, 37],
+                    popupAnchor: [0, -37]
+                }),
+            });
+        },
+        onEachFeature: function(feature,layer) {
+            let prop = feature.properties;
+            let array = feature.geometry.coordinates
+            layer.bindPopup (`
+            <h4> ${prop.name}, ${array[2]} m ü. NN </h4>
+            Lufttemperatur in °C: ${prop.LT|| "nicht angegeben"}<br>
+            Relative Luftfeuchte in %: ${prop.RH || "nicht angegeben"} <br>
+            Windgeschwindigkeit in km/h: ${prop.WG|| "nicht angegeben"} <br>
+            Schneehöhe in cm: ${prop.HS || "nicht angegeben"} 
+            `)
+        }
+
+       
+    }).addTo(themaLayer.stations)
+  
 
     // Wetterstationen mit Icons und Popups implementieren
 
