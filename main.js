@@ -40,7 +40,6 @@ async function showStations(url) {
     let jsondata = await response.json();
     L.geoJSON(jsondata, {
         pointToLayer: function (feature, latlng){
-            console.log(feature.geometry.coordinates)
             return L.marker (latlng, {
                 icon: L.icon({
                     iconUrl: "icons/icons.png",
@@ -53,16 +52,21 @@ async function showStations(url) {
         onEachFeature: function(feature,layer) {
             let prop = feature.properties;
             let array = feature.geometry.coordinates
+            let pointInTime = new Date (prop.date); //erzeug mir ein neues Java Daten objekt das prop.date heißt  => richtiges Datum erstellt
+            console.log(pointInTime);
             layer.bindPopup (`
             <h4> ${prop.name}, ${array[2]} m ü. NN </h4>
-            Lufttemperatur in °C: ${prop.LT|| "-"}<br>
-            Relative Luftfeuchte in %: ${prop.RH || "-"} <br>
-            Windgeschwindigkeit in km/h: ${(prop.WG*3.6).toFixed(1)|| "-"} <br> //auf eine nachkomma stelle gerundet
-            Schneehöhe in cm: ${prop.HS || "-"} 
+           <ul>
+            <li> Lufttemperatur in °C: ${prop.LT|| "-"} </li>
+            <li> Relative Luftfeuchte in %: ${prop.RH || "-"} </li>
+            <li> Windgeschwindigkeit in km/h: ${(prop.WG*3.6).toFixed(1)|| "-"} </li> 
+            <li> Schneehöhe in cm: ${prop.HS || "-"} </li>
+            </ul>
+            <span>${pointInTime.toLocaleDateString()}</span>
             `);
         }
         //if (prop.WG) {return (prop.WG *3.6).toFixed(1);}else {return "-";} /toFixed: ich will nur eine Nachkomma stelle
-        
+        //to.LocaleDateString() => normales Datum tt.mm.jjjj
 
        
     }).addTo(themaLayer.stations)
