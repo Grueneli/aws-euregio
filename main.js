@@ -31,6 +31,9 @@ let layerControl = L.control.layers({
     "Temperatur": themaLayer.temperatur.addTo(map),
 }).addTo(map);
 
+layerControl.expand();
+
+
 // Maßstab
 L.control.scale({
     imperial: false,
