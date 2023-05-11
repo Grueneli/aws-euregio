@@ -13,7 +13,8 @@ let map = L.map("map", {
 
 // thematische Layer
 let themaLayer = {
-    stations: L.featureGroup()
+    stations: L.featureGroup(),
+    temperatur: L.featureGroup(),
 }
 
 // Hintergrundlayer
@@ -26,7 +27,8 @@ let layerControl = L.control.layers({
     "Esri WorldTopoMap": L.tileLayer.provider("Esri.WorldTopoMap"),
     "Esri WorldImagery": L.tileLayer.provider("Esri.WorldImagery")
 }, {
-    "Wetterstationen": themaLayer.stations.addTo(map)
+    "Wetterstationen": themaLayer.stations.addTo(map),
+    "Temperatur": themaLayer.temperatur.addTo(map),
 }).addTo(map);
 
 // Maßstab
@@ -34,10 +36,7 @@ L.control.scale({
     imperial: false,
 }).addTo(map);
 
-// Wetterstationen Tirol
-async function showStations(url) {
-    let response = await fetch(url);
-    let jsondata = await response.json();
+function writeStationLayer(jsondata) {
     L.geoJSON(jsondata, {
         pointToLayer: function (feature, latlng){
             return L.marker (latlng, {
@@ -70,9 +69,17 @@ async function showStations(url) {
 
        
     }).addTo(themaLayer.stations)
+}
+
+// Wetterstationen Tirol
+async function loadStations(url) {
+    let response = await fetch(url);
+    let jsondata = await response.json();
+    writeStationLayer (jsondata);
+   
   
 
     // Wetterstationen mit Icons und Popups implementieren
 
 }
-showStations("https://static.avalanche.report/weather_stations/stations.geojson");
+loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
