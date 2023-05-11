@@ -27,7 +27,7 @@ let layerControl = L.control.layers({
     "Esri WorldTopoMap": L.tileLayer.provider("Esri.WorldTopoMap"),
     "Esri WorldImagery": L.tileLayer.provider("Esri.WorldImagery")
 }, {
-    "Wetterstationen": themaLayer.stations.addTo(map),
+    "Wetterstationen": themaLayer.stations,
     "Temperatur": themaLayer.temperatur.addTo(map),
 }).addTo(map);
 
@@ -52,7 +52,7 @@ function writeStationLayer(jsondata) {
             let prop = feature.properties;
             let array = feature.geometry.coordinates
             let pointInTime = new Date (prop.date); //erzeug mir ein neues Java Daten objekt das prop.date heißt  => richtiges Datum erstellt
-            console.log(pointInTime);
+            //console.log(pointInTime);
             layer.bindPopup (`
             <h4> ${prop.name}, ${array[2]} m ü. NN </h4>
            <ul>
@@ -71,12 +71,25 @@ function writeStationLayer(jsondata) {
     }).addTo(themaLayer.stations)
 }
 
+function writeTemperatureLayer (jsondata){
+    L.geoJSON(jsondata, {
+        pointToLayer: function (feature, latlng){
+            
+            return L.marker (latlng, {
+                icon: L.divIcon({
+                 html: `<span>${feature.properties.LT}</span>`  
+                }),
+            });
+        },
+    }).addTo(themaLayer.temperatur);
+}
+
 // Wetterstationen Tirol
 async function loadStations(url) {
     let response = await fetch(url);
     let jsondata = await response.json();
     writeStationLayer (jsondata);
-   
+    writeTemperatureLayer (jsondata);
   
 
     // Wetterstationen mit Icons und Popups implementieren
