@@ -8,7 +8,7 @@ let ibk = {
 
 // Karte initialisieren
 let map = L.map("map", {
-    fullscreenControl: true
+    fullscreenControl: true, maxZoom: 12,
 }).setView([ibk.lat, ibk.lng], 11);
 
 // thematische Layer
