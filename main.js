@@ -39,6 +39,15 @@ L.control.scale({
     imperial: false,
 }).addTo(map);
 
+function getColor(value, ramp) { //value = temperatur, ramp= Colorramp
+ for(let rule of ramp){ //rule wird dann überprüft ob sie zwischen min und max ist
+        if (value >= rule.min && value < rule.max){
+            return rule.color;
+        }
+    }
+}
+console.log (getColor(-40, COLORS.temperatur));
+
 function writeStationLayer(jsondata) {
     L.geoJSON(jsondata, {
         pointToLayer: function (feature, latlng){
@@ -83,11 +92,11 @@ function writeTemperatureLayer (jsondata){
             }
         },
         pointToLayer: function (feature, latlng){
-            
+            let color = getColor (feature.properties.LT, COLORS.temperatur); //Variable definieren mit zwei werten: da wo wir die werte herbekommen (LT) und wo wir die Farben finden
             return L.marker (latlng, {
                 icon: L.divIcon({
                     className: "aws-div-icon",
-                 html: `<span>${feature.properties.LT}</span>`  
+                 html: `<span style= "background-color:${color}">${feature.properties.LT.toFixed(1)}</span>`  
                 }),
             });
         },
