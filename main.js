@@ -15,6 +15,7 @@ let map = L.map("map", {
 let themaLayer = {
     stations: L.featureGroup(),
     temperatur: L.featureGroup(),
+    wind: L.featureGroup(),
 }
 
 // Hintergrundlayer
@@ -29,6 +30,7 @@ let layerControl = L.control.layers({
 }, {
     "Wetterstationen": themaLayer.stations,
     "Temperatur": themaLayer.temperatur.addTo(map),
+    "Wind": themaLayer.wind.addTo(map),
 }).addTo(map);
 
 layerControl.expand();
@@ -102,6 +104,25 @@ function writeTemperatureLayer (jsondata){
         },
     }).addTo(themaLayer.temperatur);
 }
+function writeWindLayer (jsondata){ // anpasssen
+    L.geoJSON(jsondata, {
+        filter: function (feature){
+            if (feature.properties.WG > 0 && feature.properties.WG <300){
+                return true;
+
+            }
+        },
+        pointToLayer: function (feature, latlng){
+            let color = getColor (feature.properties.WG, COLORS.wind); //Variable definieren mit zwei werten: da wo wir die werte herbekommen (LT) und wo wir die Farben finden
+            return L.marker (latlng, {
+                icon: L.divIcon({
+                    className: "aws-div-icon",
+                 html: `<span style= "background-color:${color}">${feature.properties.WG.toFixed(1)}</span>`  
+                }),
+            });
+        },
+    }).addTo(themaLayer.wind); 
+}
 
 // Wetterstationen Tirol
 async function loadStations(url) {
@@ -109,6 +130,7 @@ async function loadStations(url) {
     let jsondata = await response.json();
     writeStationLayer (jsondata);
     writeTemperatureLayer (jsondata);
+    writeWindLayer(jsondata);
   
 
     // Wetterstationen mit Icons und Popups implementieren
