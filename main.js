@@ -16,6 +16,7 @@ let themaLayer = {
     stations: L.featureGroup(),
     temperatur: L.featureGroup(),
     wind: L.featureGroup(),
+    snowhights: L.featureGroup(),
 }
 
 // Hintergrundlayer
@@ -31,6 +32,7 @@ let layerControl = L.control.layers({
     "Wetterstationen": themaLayer.stations,
     "Temperatur": themaLayer.temperatur.addTo(map),
     "Wind": themaLayer.wind.addTo(map),
+    "Schneehöhen": themaLayer.snowhights.addTo(map),
 }).addTo(map);
 
 layerControl.expand();
@@ -85,6 +87,7 @@ function writeStationLayer(jsondata) {
     }).addTo(themaLayer.stations)
 }
 
+// Icon für Temperatur 
 function writeTemperatureLayer (jsondata){
     L.geoJSON(jsondata, {
         filter: function (feature){
@@ -104,6 +107,7 @@ function writeTemperatureLayer (jsondata){
         },
     }).addTo(themaLayer.temperatur);
 }
+// Icon für Wind
 function writeWindLayer (jsondata){ // anpasssen
     L.geoJSON(jsondata, {
         filter: function (feature){
@@ -124,6 +128,27 @@ function writeWindLayer (jsondata){ // anpasssen
     }).addTo(themaLayer.wind); 
 }
 
+//Icon für Schneehöhe
+function writeSchneehöhenLayer (jsondata){ // anpasssen
+    L.geoJSON(jsondata, {
+        filter: function (feature){
+            if (feature.properties.HS > 0 && feature.properties.HS <1000){
+                return true;
+
+            }
+        },
+        pointToLayer: function (feature, latlng){
+            let color = getColor (feature.properties.HS, COLORS.snowhights); //Variable definieren mit zwei werten: da wo wir die werte herbekommen (LT) und wo wir die Farben finden
+            return L.marker (latlng, {
+                icon: L.divIcon({
+                    className: "aws-div-icon",
+                 html: `<span style= "background-color:${color}">${feature.properties.HS.toFixed(1)}</span>`  
+                }),
+            });
+        },
+    }).addTo(themaLayer.snowhights); 
+}
+
 // Wetterstationen Tirol
 async function loadStations(url) {
     let response = await fetch(url);
@@ -131,6 +156,7 @@ async function loadStations(url) {
     writeStationLayer (jsondata);
     writeTemperatureLayer (jsondata);
     writeWindLayer(jsondata);
+    writeSchneehöhenLayer(jsondata);
   
 
     // Wetterstationen mit Icons und Popups implementieren
