@@ -52,6 +52,18 @@ function getColor(value, ramp) { //value = temperatur, ramp= Colorramp
 }
 console.log (getColor(-40, COLORS.temperatur));
 
+//Rain Viewer
+L.control.rainviewer({ 
+    position: 'bottomleft',
+    nextButtonText: '>',
+    playStopButtonText: 'Play/Stop',
+    prevButtonText: '<',
+    positionSliderLabelText: "Hour:",
+    opacitySliderLabelText: "Opacity:",
+    animationInterval: 500,
+    opacity: 0.5
+}).addTo(map);
+
 function writeStationLayer(jsondata) {
     L.geoJSON(jsondata, {
         pointToLayer: function (feature, latlng){
